@@ -205,7 +205,13 @@ $(d).ready(
 			"background":"none"
 		});
 		$("#rb_search_container").remove();
-		//$("div.pacific-header").remove();
+		$("div.pacific-header").remove();
+		$("div.application-header").css({
+			"text-align":"center",
+			"height":"120px",
+			"background":"rgb(255,255,255)",
+			"overflow":"hidden"
+		}).html("<img src = '{!#HOSTED_FILE.1538307}' style='margin:auto'>");
 		$("#rbe_tabs").css({
 			"position":"fixed",
 			"top":"0px",
