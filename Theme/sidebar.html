@@ -205,7 +205,7 @@ $(d).ready(
 			"background":"none"
 		});
 		$("#rb_search_container").remove();
-		$("div.pacific-header").remove();
+		//$("div.pacific-header").remove();
 		$("#rbe_tabs").css({
 			"position":"fixed",
 			"top":"0px",
@@ -215,8 +215,8 @@ $(d).ready(
 			"float":"left",
 			"position":"absolute",
 			"z-index":"999999"
-		}).children().each(function(index){
-			$(this).children().first().css({
+		}).children().each(function(){
+			$(this).css("border","none").children().first().css({
 				"color":"rgba(55,55,55,0.5)",
 				"text-shadow":"0px 0px 0px",
 				"font-weight":"200"
