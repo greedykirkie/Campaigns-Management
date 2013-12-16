@@ -1,0 +1,412 @@
+<link href="{!#HOSTED_FILE.1511894}" rel="stylesheet" type="text/css" />
+<link rel='shortcut icon' type='image/x-icon' href='/shared/MPISCOSO/oneygc/img/favicon.ico'>
+<link rel='icon' type='image/ico' href='/shared/MPISCOSO/oneygc/img/favicon.ico'>
+<script>
+/*	--------  GLOBAL FUNCTIONS  --------*/
+/*	------- Created By: MPISCOSO ------- */
+var d=document; //Code Shortener
+String.prototype.c_sectionHide = function(flag,speed) {/*
+	Function: c_sectionHide
+	Prototype Section Hide - Section hiding by title instead of ID
+	Created At: 03-19-2012
+	Usage: "sectionTitle".c_sectionHide(true/false,'fast/slow/millisecond value'); */
+	try {
+		var section = new String(this);
+		section = "rbi_S_" + String(rbf_getSectionIdByTitle(section));
+		if (flag == true) {
+			if ( String(speed) != 'undefined') $( String("#"+section) ).show('blind',speed);
+			else $( String("#"+section) ).show();
+		} else {
+			if ( String(speed) != 'undefined') $( String("#"+section) ).hide('blind',speed);
+			else $( String("#"+section) ).hide();
+		}
+	} catch(e) { alert(section + "  " + e.message); }
+};
+var c_span = d.createElement('span'); c_span.id = 'sectionCSS';
+d.getElementsByTagName('body').item(0).appendChild( c_span );
+String.prototype.c_sectionCSS = function(cssStyle,alertOn) {/*
+	Function: c_sectionCSS
+	Prototype Section CSS - Add CSS tags to specific sections
+	Created At: 03-20-2012
+	Usage: "sectionTitle".c_sectionCSS(["div { border:1px; }","td { display:none; }"],true/false);
+		OR "sectionTitle".c_sectionCSS("div { border:1px; }",true/false);
+		Set alertOn to true if you want to alert preview your CSS */
+	try {
+		var section = new String(this),placeholder=d.getElementById('sectionCSS');
+		section = "#rbi_S_" + String(rbf_getSectionIdByTitle(section)),
+		count=0;
+		if ( typeof(cssStyle) == 'object' ) {
+			if (cssStyle.length) {
+				var compiledCSS = d.createElement('style'); compiledCSS.setAttribute("type", "text/css");
+				var cssText = '';
+				do {
+					cssText += section + " " + cssStyle[count];
+					count++;
+				} while(count!= cssStyle.length);				
+				if(compiledCSS.styleSheet) compiledCSS.styleSheet.cssText = cssText;
+				else compiledCSS.textContent = cssText;			
+				placeholder.appendChild(compiledCSS);
+			} else alert("Invalid CSS for "+section+" options must be an array or string.");
+		} else if ( typeof(cssStyle) == 'string') {
+			var compiledCSS = d.createElement('style'); compiledCSS.setAttribute("type", "text/css");
+			if(compiledCSS.styleSheet) compiledCSS.styleSheet.cssText = section + " " + cssStyle;
+			else compiledCSS.textContent = section + " " + cssStyle;
+			placeholder.appendChild(compiledCSS);
+		}
+		else alert("Invalid CSS for "+section+" options must be an array or string.");
+		if (alertOn) alert(placeholder.innerHTML);
+	} catch(e) { throw (section + "  " + e.message); }
+};
+String.prototype.c_showHide = function(flag) {/*
+	Function: c_showHide
+	Prototype Show Hide - Overrides field show hide
+	Created At: 03-14-2012
+	Usage: "fieldName".c_showHide(true/false);*/	
+	var field = this;
+	var mode = '', label;
+	try {
+		label = "rbi_L_" + field; field = "rbi_F_" + field;
+		if (flag) {
+			$(d.getElementById(field)).css({opacity:0,display:''});
+			$(d.getElementById(label)).css({opacity:0,display:''});
+			$(d.getElementById(field)).animate({opacity:1});
+			$(d.getElementById(label)).animate({opacity:1});
+		} else {
+			$(d.getElementById(field)).css({opacity:0,display:'none'});
+			$(d.getElementById(label)).css({opacity:0,display:'none'});
+		}
+	} catch(e) { alert(field + "  " + e.message); }
+};
+String.prototype.c_rowHide = function(flag) {/*
+	Function: c_rowHide
+	Prototype Row Hide - Shows and Hides Rows and Fields within
+	Created At: 03-14-2012
+	Usage: "fieldName".c_rowHide(true/false);
+		- This will hide the row where the field is placed */	
+	var field = this;
+	var mode = '', label;
+	try {
+		row = "rbi_L_" + field;
+		if (flag) {
+			$(d.getElementById(row).parentNode).animate({opacity:1});
+			d.getElementById(row).parentNode.style.display='';
+		} else {
+			$(d.getElementById(row).parentNode).css({opacity:0});
+			d.getElementById(row).parentNode.style.display='none';
+		}
+	} catch(e) { alert(field + "  " + e.message); }
+};
+function c_alphanum(evt) {/*
+	Function: c_alphanum
+	Allows only alphanumerical input & cancels out special characters onkeypress/up/down
+	Created At: 06-09-2011
+	Usage: return c_alphanum(event); on events onkeypress/up/down */	
+	evt = (evt) ? evt : event; 
+    var charCode = (evt.charCode) ? evt.charCode : ((evt.keyCode) ? evt.keyCode : ((evt.which) ? evt.which : 0))
+	var character = String.fromCharCode(charCode);	
+	if (evt.shiftKey && charCode > 47 && charCode < 58) return false;	
+	else if (charCode > 47 && charCode < 58) return true;	
+	if (charCode == 8 || charCode == 9 || charCode == 13 || charCode == 46 || charCode == 37 || charCode == 39 ||
+		charCode == 32) return true;
+	if (charCode > 31 && (charCode < 65 || charCode > 90) && (charCode < 96 || charCode > 122))	return false;
+	else return true;	
+}
+
+function c_numerical(evt,deci) {/*
+	Function: c_numerical
+	Allows only numerical input & cancels out alpha & special characters onkeypress/up/down
+	Created At: 06-09-2011
+	Usage: return c_numerical(event,true/false); on events onkeypress/up/down
+		- set the deci parameter to true to allow decimal points */
+	var charCode = (evt.which) ? evt.which : event.keyCode;
+	var character = String.fromCharCode(charCode);
+	if (deci) { //allow decimal
+		if (charCode == 190 || charCode == 110 || charCode == 46) {
+			if (character == "%") return false;
+			else return true;
+		}
+	} 
+	if (charCode == 8 || charCode == 9 || charCode == 13 || charCode == 46 || charCode == 37 || charCode == 39) {
+		if (character == "%") return false;
+		else return true;
+	}
+	if (charCode > 31 && (charCode < 48 || charCode > 57) ) {
+		if (charCode >= 96 && charCode <=105) {
+			if (character == "%") return false;
+			else return true;
+		} else return false;
+	} else {
+		if (character == "%") return false;
+		else return true;
+	}	
+}
+function c_alpha(evt) {/*
+	Function: c_alpha
+	Allows only alpha input & cancels out numerical & special characters onkeypress/up/down
+	Created At: 06-09-2011
+	Usage: return c_alpha(event); on events onkeypress/up/down */
+	evt = (evt) ? evt : event; 
+    var charCode = (evt.charCode) ? evt.charCode : ((evt.keyCode) ? evt.keyCode : ((evt.which) ? evt.which : 0))
+	if (charCode == 8 || charCode == 9 || charCode == 13 || charCode == 46 || charCode == 37 || charCode == 39 ||
+	charCode == 32) return true;
+	if (charCode > 31 && (charCode < 65 || charCode > 90) && (charCode < 97 || charCode > 122)) {
+		return false;
+	} else {			
+		return true;
+	}
+}
+</script>
+<style>
+html{
+	background:url("{!#HOSTED_FILE.1513035}") repeat-x bottom;
+}
+body{
+	background:url("{!#HOSTED_FILE.1513034}") no-repeat top left fixed;
+}
+.dock-container2 { height:130px !important; margin-top:30px; }
+.dock {
+	height:1px;
+}
+#rbe_tabs, #rbe_tabs {  }
+#rbe_tabs div{ margin:5px; }
+table.rbs_wideTable { display:table !important; display:block !important \0/; *display:block !important; }
+body { padding-bottom: 100px !important; }
+#rbi_appTreeSection { display:block !important; *position:absolute !important; }
+#rbi_appTreeSection span img, #rbi_appTreeSection .rbs_sidebarLink { visibility:hidden; }
+#rbe_tabs{
+	background: -webkit-linear-gradient(bottom,rgb(22,22,22),rgb(66,66,66));
+	background: -moz-linear-gradient(bottom,rgb(22,22,22),rgb(66,66,66));
+	z-index:9999999;
+}
+#myApps {
+	display:none; background:url("{!#HOSTED_FILE.1513037}") center left no-repeat;
+	position:fixed !important; color:#000 !important; float:left !important;
+	top:7px; left:5px; right:0; bottom:0; height:12px; border-radius:5px; border:1px hidden #FFF; z-index:5;
+	width:80px; vertical-align:middle; font-size:11px; cursor:pointer; padding-left:30px; padding-bottom:8px;
+}
+
+.headerText {
+	/*padding:13px; padding-top:15px; padding-left:20px;*/
+	/*background:url(img/c_rpt.png) #f1f1f1;*/
+	background:#0078AE url("{!#HOSTED_FILE.1513038}") 50% 50% repeat-x;
+	color:#FFF;	text-transform:capitalize; font-weight:bold;
+	font-size:120%; text-align:left; -webkit-border-radius: 5px; -moz-border-radius: 5px;
+	border:1px solid #77D5F7; text-align:justify; padding: .5em .5em .5em .7em;
+} .headerText span { text-indent:20px; }
+td.rbs_rightWideLabelRequired, td.rbs_rightLabelRequired {
+	padding-right:16px; background:url("{!#HOSTED_FILE.1513039}") top right no-repeat;
+}
+</style>
+<script>
+$(d).ready(
+	function() {
+		$("body").children("table").eq(0).hide();
+		$("#headerBox div").css({
+			"background":"none"
+		});
+		$("#rb_search_container").remove();
+		$("div.pacific-header").remove();
+		$("#rbe_tabs").css({
+			"position":"fixed",
+			"top":"0px",
+			"left":"0px",
+			"z-index":"9999999"
+		}).find("ul.dropdown-menu").css({
+			"float":"left",
+			"position":"absolute",
+			"z-index":"999999"
+		}).children().each(function(index){
+			$(this).children().first().css({
+				"color":"rgba(55,55,55,0.5)",
+				"text-shadow":"0px 0px 0px",
+				"font-weight":"200"
+			});
+		});
+		/*
+		$("#rbe_tabs ul.dropdown-menu").css({
+			"z-index":"99999",
+			"position":"absolute",
+			"left":"-1000px",
+			"width":"100%",
+			"border":"none",
+			"background":"none"
+		}).children().each(function(){
+			$(this).css({
+				"display":"inline-block",
+				"margin":"10px",
+				"border":"none",
+				"box-shadow":"0px 0px 0px rgba(0,0,0,0.0)"
+			});
+		});
+		$("#rbe_tabs span.caret").css({
+			"border-top": "4px solid rgb(255,255,255)",
+			"margin":"0px",
+			"color":"rgb(255,255,255)"
+		}).parent().css("background","transparent").parent().css("background","transparent").removeAttr("data-toggle").click(function(){
+			$("#rbe_tabs").animate({
+				"height":"70px"
+			},200, function(){
+				$("#rbe_tabs ul.dropdown-menu").show().animate({
+					"left":"5px"
+				},200);
+			});
+		});*/
+		$("#rbe_tabs span.caret").css({
+			"border-top": "4px solid rgb(255,255,255)",
+			"margin":"0px",
+			"color":"rgb(255,255,255)"
+		}).parent().css("background","transparent").parent().css("background","transparent");
+		$("#sidebarControl").hide();
+		
+		if (d.getElementById('createAction')) d.getElementById('createAction').checked = false;
+		if (!window.opener || !parent.document) { //check if inside a window
+			genMenu();
+		} else if (d.getElementById('rbe_tabs')) {
+			genMenu(); // for IE when opened in new tab
+		} else { //check if inside a window
+			$('body').css('visibility','visible');				 						//show body			
+		}
+		
+		if (String(window.location.href).indexOf('reportEmail') != -1) { //disable report filters in reportEmail pages
+			d.getElementById('rbe_filtersList').parentNode.parentNode.parentNode.parentNode.style.display = 'none';
+			var filtertable = d.getElementById('rbe_filtersList').parentNode.parentNode.parentNode.parentNode.parentNode.getElementsByTagName('table').item(11);
+			filtertable.style.display = 'none';
+			$('input[value^=" Clear "]').css('display','none'); //disable clear button			
+		}
+	} 
+);
+function genMenu() {
+	/*
+	if (d.getElementById('rbe_tabs') || d.getElementById('rbe_tabs')) { //anti-error - check for menu or tabs component
+		if (d.getElementById('rbe_selectedTab')) {
+			var leftpos = $('#rbe_selectedTab').position().left,toppos = $('#rbe_tabs').position().top;
+		} else {
+			var leftpos = 0,toppos = 0;
+		}
+		var menuitems = d.getElementById('rbe_tabs').getElementsByTagName('div').length;
+		if (menuitems > 0) {
+			var divs = d.getElementById('rbe_tabs').getElementsByTagName('div'),dCount=0,dHeight=0,
+			startWidth=$('#rbe_tabs').css('width');
+			do{ 
+				divs.item(dCount).style.cssFloat = 'none'; divs.item(dCount).style.width = startWidth;
+				divs.item(dCount).style.whiteSpace = 'normal';
+				if (String(divs.item(dCount).innerHTML).indexOf('|') != -1) divs.item(dCount).style.display = 'none';
+				else dHeight+=parseInt(divs.item(dCount).style.height);
+				dCount++;
+			}while(dCount!=divs.length);
+			if (menuitems == 2 && "{!#CURR_USER.role#code}"!="$admin") divs.item(1).style.display='none';
+			$('#rbe_tabs').css('height', 20+dHeight);
+		} 
+		toppos =  toppos + parseInt( $('#rbe_tabs').css('height') );
+		if (d.getElementById('rbe_selectedTab'))
+			leftpos = leftpos - parseInt( $('#rbe_selectedTab').css('width') )/4;
+		else leftpos = 0;
+		$('#rbe_tabs').css('top', toppos );
+		$('#rbe_tabs').css('left', leftpos );
+		//adjust the division of width depending on the # of tabs		
+		$('#rbe_tabs').css({'visibility':'visible',"position":"fixed","display":"none","opacity":0});
+		if (d.getElementById('rbe_selectedTab')) {
+			$('#rbe_selectedTab').mouseenter( function() {
+				if ($('#rbe_tabs').css('display') == 'none') {						
+					$('#rbe_tabs').css({'top':0,'display':'block','opacity':0}).animate({
+						'top':toppos,'opacity':1
+					});
+				}
+			});
+		}
+		$('#rbe_tabs').mouseleave( function() { 
+			$('#rbe_tabs').animate({ 'top':'-300px' },function() {
+				$('#rbe_tabs').css({'display':'none'}) });
+		});
+		//sidebar
+		var myApps=d.createElement('div'); myApps.id='myApps';
+		d.getElementById('rbe_tabs').parentNode.appendChild(myApps);
+
+		var cont=d.getElementById('myApps'); var apptree = $('#rbi_appTreeSection'),
+		myTable = d.createElement('table'); myTable.id='myTable';
+		myTr = d.createElement('tr'); myTr.id='myTr';
+		$('body').append( myTable );
+		$('#myTable').append( myTr );
+		$('#myTr').append( apptree );
+		$('#rbi_appTreeSection').css({
+			position:'fixed',top:36, 'left':'-200px',width:200,height:'auto','z-index':3000
+		});
+		//$('#rbe_sidebarTD').css({ position:'fixed',top:'0px','left':'0px' });
+		if ("{!#CURR_USER.role#code}"=="$admin") {
+			try {
+				var iHtml = String(d.getElementById('rbi_appTreeSection').innerHTML);
+				iHtml = iHtml.replace(/onmouseover="this.className='highlight'/gi,'');
+				$('#rbi_appTreeSection').html(iHtml);
+			} catch(e) {}
+			$(cont).click(
+				function() {
+					if ( $('#rbi_appTreeSection').css('left') == '-200px') {
+						$('#rbi_appTreeSection').animate({ 'left':'0' });
+					}
+					else
+						$('#rbi_appTreeSection').css({'display':'none'}).animate({ 'left':'-200px' });						
+				}
+			);
+			$(cont).find('a').click(
+				function() {
+					$('#rbi_appTreeSection').css({'display':'none'}).animate({ 'left':'-200px' });
+				}
+			);
+			$("#rbe_setupDD").css('display','block');
+		} else {
+			$(cont).css({'cursor':'auto','width':'20px'});
+		}
+		//generate green circle icons		
+		var tabmenu = d.getElementById('rbe_tabs'),menu_a=tabmenu.getElementsByTagName('a'),aCount=0;
+		if ("{!#CURR_USER.role#code}"=="$admin") var counter = menu_a.length-1; else counter = menu_a.length;
+		do {
+			var temp=d.createElement('img'); temp.align='left'; temp.className='menu_img';
+			temp.src = "{!#HOSTED_FILE.1513024}";
+			menu_a.item(aCount).insertBefore(temp,menu_a.item(aCount).lastChild);
+			aCount++;
+		} while(aCount!=counter);
+		//generate blue circle icons
+		var submenu = d.getElementById('rbe_tabs'),
+		sub_div=submenu.getElementsByTagName('div'),dCount=0;
+		if (sub_div.length>1) {
+			do {
+				var sub_a=sub_div.item(dCount).getElementsByTagName('a');
+				var temp=d.createElement('img'); temp.align='absmiddle'; temp.className='sub_img';
+				temp.src = "{!#HOSTED_FILE.1513021}";
+				try { sub_a.item(0).insertBefore(temp,sub_a.item(0).lastChild); }catch(e){} //error-handling
+				dCount++;
+			} while(dCount!=sub_div.length); //exclude div containing edit pdf and print
+		} 
+		if (sub_div.length==1) {
+			if ( String(sub_div.item(0).innerHTML).length < 20)
+			$('#rbe_tabs').css({ 'display':'none','visibility':'hidden'});
+		}
+		
+		$('body').css('visibility','visible');				 		//show body
+		$('.rbs_header .rounding').appendTo('#rbe_tabs'); 			//setup comp to tabs
+		$('#rbe_tabs .rounding').css({ display:'block' }); 			//show setup comp
+		$('#rbe_tabs').hide().css('visibility','visible');			//hide tab menu
+		try {
+			$('#rbe_tabs').show("clip",'slow').css({ opacity:0.95 });	//show animate tab menu
+		} catch(e) {
+			$('#rbe_tabs').css({
+				display:'block','visibility':'visible',opacity:0.95		//show no-animate catcher
+			});		
+		}
+		$('#myApps').css({ display:'block' });							//show sidebar menu	
+	} else { //anti-error
+		$('body').css('visibility','visible');									//show body
+		$('.rbs_header .rounding').css({ display:'block', "z-index":-1 }); 		//show setup comp
+		$('#rbi_appTreeSection').css({ display:'block' }) 						//show sidebar
+		$('#rbe_sidebarTD').css({ opacity:1,display:'block' }) 					//show sidebar			
+	}
+	*/
+}
+</script>
+<style>
+.menu_img,.sub_img { margin-top:3px; margin-right:-5px; height:10px !important; width:10px !important; }
+.sub_img { margin-right:7px; margin-top:-5px; *margin-top:0; }
+.menu_img { *margin-top:-18px; }
+.rbs_errorDataCol font { display:block; }
+table.rbs_wideTable .center.mozcenter { visibility: visible !important; }
+</style>
