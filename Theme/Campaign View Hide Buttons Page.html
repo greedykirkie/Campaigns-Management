@@ -1,0 +1,11 @@
+<script>
+	var clientSection = "#rbi_S_"+rbf_getSectionIdByTitle("Clients");
+	var newButton = $(clientSection).children().find("a:contains(New Client)");
+	setInterval(function(){
+		if("{!campaign_type#code}" == "MC"){
+			newButton.show();
+		}else{
+			newButton.hide();
+		}
+	},200);
+</script>
